@@ -1,8 +1,9 @@
 ---
-title: "Cryptocommunity Dashboard"
+title: "Flexdashboard"
 author: "Max Kruisbrink"
 output: 
   flexdashboard::flex_dashboard:
+    favicon: "20220808_maxplaining-logo-48x48.jpg"
     orientation: rows
     social: menu
 ---
@@ -77,14 +78,129 @@ stocks_vs_crypto <- read.csv("data/stocks-vs-crypto.csv")
 ```
 
 
-Market Tables
+Sidebar {.sidebar}
 =======================================================================
 
+This `flexdashboard` is made with *R markdown* (`.Rmd`) and uses several API services such as [Nomics.com](https://p.nomics.com/cryptocurrency-bitcoin-api) while webscraping for other relevant data. 
 
-ow {.tabset .tabset-fade}
+The dashboard should be considered a ***work in progress*** and will be updated regularly. 
+
+**Some planned features include:**
+
+* fully automated (daily) updates
+* interactive historic time series (shiny)
+* dead & inactive coins
+* additional metrics & charts
+* change % heatmaps
+* additional on-chain analysis
+* sentiment analysis
+* economic indicators
+
+I have loads of plans for this dashboard and might create multiple dashboard as this one grows in size.
+
+email: [max@cryptocommunity.nl](mailto:max@cryptocommunity.nl)
+ 
+Active Projects
+=======================================================================
+
+Row
 -------------------------------------
 
-### Market Table 1
+### Refresh Timestamp
+```{r}
+valueBox(Sys.Date(),
+         icon = "fa-calendar")
+```
+
+```{r include=FALSE}
+active_projects <- webscraped_active_projects %>% 
+                      group_by(platform_currency) %>% 
+                      summarise(count = n())
+```
+
+
+### Platform Currencies
+```{r}
+
+valueBox(value = length(active_projects$platform_currency),
+         icon = "fa-hashtag"
+         )
+```
+
+
+
+### Active Projects on ETH
+```{r}
+
+valueBox(value = active_projects %>% 
+           filter(platform_currency == "ETH") %>% 
+           select(count),
+         icon = "fa-hashtag")
+```
+
+### Active Projects on BNB
+```{r}
+
+active_projects <- webscraped_active_projects %>% 
+                      group_by(platform_currency) %>% 
+                      summarise(count = n())
+            
+valueBox(value = active_projects %>% 
+           filter(platform_currency == "BNB") %>% 
+           select(count),
+         icon = "fa-hashtag")
+```
+
+
+### Active SOLO projects
+
+```{r}
+
+active_projects <- webscraped_active_projects %>% 
+                      group_by(platform_currency) %>% 
+                      summarise(count = n())
+            
+valueBox(value =  active_projects %>% 
+           filter(is.na(platform_currency)) %>% 
+           select(count),
+         icon = "fa-hashtag"
+         )
+```
+
+
+### Active Projects on MATIC
+```{r}
+
+active_projects <- webscraped_active_projects %>% 
+                      group_by(platform_currency) %>% 
+                      summarise(count = n())
+            
+valueBox(active_projects %>% 
+           filter(platform_currency == "MATIC") %>% 
+           select(count),
+         icon = "fa-hashtag")
+```
+
+
+### Active Projects on SOL
+```{r}
+
+active_projects <- webscraped_active_projects %>% 
+                      group_by(platform_currency) %>% 
+                      summarise(count = n())
+            
+valueBox(active_projects %>% 
+           filter(platform_currency == "SOL") %>% 
+           select(count),
+         icon = "fa-hashtag")
+```
+
+
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### Active Projects
 
 ```{r reactable}
 
@@ -118,14 +234,12 @@ webscraped_active_projects %>%
     high = colDef(name = "Highest Price",
                   format = colFormat(prefix = "€", 
                                       separators = TRUE, 
-                                      digits = 2)
-                  ),
+                                      digits = 2)),
     price_pct_ath = colDef(name = "Price % from ATH",
                            format = colFormat(suffix = "%",
                                       digits = 1),
                            style = color_scales(., colors = c('#ff0000', '#ffa700', '#fff400', "#a3ff00", "#2cba00"), 
-                                                bold_text = TRUE),
-                           ),
+                                                bold_text = TRUE)),
     high_timestamp = colDef(name = "ATH Timestamp",
                             format = colFormat(date = TRUE)
                             ),
@@ -136,7 +250,7 @@ webscraped_active_projects %>%
     market_cap = colDef(name = "Market Cap",
                         format = colFormat(prefix = "€", 
                                       separators = TRUE, 
-                                      digits = 2)
+                                      digits = 0)
                   ),
     market_cap_dominance = colDef(name = "Market Cap Dominance",
                                   format = colFormat(suffix = "%",
@@ -147,6 +261,41 @@ webscraped_active_projects %>%
     platform_currency = colDef(name = "Platform Currency")
   
   ))
+
+```
+
+### Price Change %
+
+```{r price change percent portfolio}
+
+library("reactablefmtr")
+
+
+currencies_ticker %>% select(logo_url,
+                      "1d_price_change_pct",
+                      "7d_price_change_pct",
+                      "30d_price_change_pct",
+                      "365d_price_change_pct",
+                      "ytd_price_change_pct") %>% 
+  reactable(
+    defaultColDef = colDef(
+      format = colFormat(percent = TRUE,
+                         separators = TRUE,
+                         digits = 1),
+      align = "center",
+      headerStyle = list(background = "#f7f7f8"),
+      style = pos_neg_colors("red", "green", 
+                             bold = TRUE),
+      ),
+    defaultPageSize = 25,
+    bordered = TRUE,
+    highlight = TRUE,
+    #style = list(fontFamily = "Montserrat, sans-serif", fontSize = "1rem"),
+      columns = list(
+         logo_url = colDef(name = "Logo",
+                           cell = embed_img(logo_url))
+         )
+  )
 
 ```
 
@@ -555,8 +704,11 @@ fg_piechart
 
 
 
-Centraal Bureau voor de Statistiek (CBS) {data-orientation=rows}
+Statistics Netherlands (CBS) {data-orientation=rows}
 =======================================================================
+
+
+
 
 Row {.tabset .tabset-fade}
 -------------------------------------
