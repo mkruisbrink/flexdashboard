@@ -67,9 +67,9 @@ UpdateGitHub <- function(repo=getwd(), untracked=TRUE, stage=TRUE, commit=TRUE, 
   }
   
   # Set credentials. This will require input in the Console. ----
-  username <- readline(prompt = "Please enter your GitHub Username: ") #ALWAYS BE CAREFUL ABOUT STORING YOUR CREDENTIALS ON GITHUB!!
-  password <- readline(prompt = "Please enter your GitHub Password: ") #ALWAYS BE CAREFUL ABOUT STORING YOUR CREDENTIALS ON GITHUB!!
-  credentials <- cred_user_pass(username = username, password = password)
+  # username <- readline(prompt = "Please enter your GitHub Username: ") #ALWAYS BE CAREFUL ABOUT STORING YOUR CREDENTIALS ON GITHUB!!
+  # password <- readline(prompt = "Please enter your GitHub Password: ") #ALWAYS BE CAREFUL ABOUT STORING YOUR CREDENTIALS ON GITHUB!!
+  credentials <- cred_user_pass(username = "mkruisbrink", password = Sys.getenv("GitHub"))
   
   # NOTE: values returned from the status() command are as follows ----
   # 1. "untracked" means new files which have not yet been added to GitHub.
