@@ -1,8 +1,9 @@
 ---
-title: "Cryptocommunity Dashboard"
+title: "Flexdashboard"
 author: "Max Kruisbrink"
 output: 
   flexdashboard::flex_dashboard:
+    favicon: "20220808_maxplaining-logo.jpg"
     orientation: rows
     social: menu
 ---
@@ -77,16 +78,135 @@ stocks_vs_crypto <- read.csv("data/stocks-vs-crypto.csv")
 ```
 
 
-Market Tables
+Sidebar {.sidebar}
 =======================================================================
 
+This `flexdashboard` is made with *R markdown* (`.Rmd`) and uses several API services such as [Nomics.com](https://p.nomics.com/cryptocurrency-bitcoin-api) while webscraping for other relevant data. 
 
-ow {.tabset .tabset-fade}
+The dashboard should be considered a ***work in progress*** and will be updated regularly. 
+
+**Some planned features include:**
+
+* fully automated (daily) updates
+* interactive historic time series (shiny)
+* dead & inactive coins
+* additional metrics & charts
+* change % heatmaps
+* additional on-chain analysis
+* sentiment analysis
+* economic indicators
+
+I have loads of plans for this dashboard and might create multiple dashboard as this one grows in size.
+
+email: [max@cryptocommunity.nl](mailto:max@cryptocommunity.nl)
+ 
+Active Projects
+=======================================================================
+
+Row
 -------------------------------------
 
-### Market Table 1
+### Refresh Timestamp
+```{r}
+valueBox(Sys.Date(),
+         icon = "fa-calendar")
+```
 
-```{r reactable}
+```{r include=FALSE}
+active_projects <- webscraped_active_projects %>% 
+                      group_by(platform_currency) %>% 
+                      summarise(count = n())
+```
+
+
+### Platform Currencies
+```{r}
+
+valueBox(value = length(active_projects$platform_currency),
+         icon = "fa-hashtag"
+         )
+```
+
+
+
+### Active Projects on ETH
+```{r}
+
+valueBox(value = active_projects %>% 
+           filter(platform_currency == "ETH") %>% 
+           select(count),
+         icon = "fa-hashtag")
+```
+
+### Active Projects on BNB
+```{r}
+
+active_projects <- webscraped_active_projects %>% 
+                      group_by(platform_currency) %>% 
+                      summarise(count = n())
+            
+valueBox(value = active_projects %>% 
+           filter(platform_currency == "BNB") %>% 
+           select(count),
+         icon = "fa-hashtag")
+```
+
+
+### Active SOLO projects
+
+```{r}
+
+active_projects <- webscraped_active_projects %>% 
+                      group_by(platform_currency) %>% 
+                      summarise(count = n())
+            
+valueBox(value =  active_projects %>% 
+           filter(is.na(platform_currency)) %>% 
+           select(count),
+         icon = "fa-hashtag"
+         )
+```
+
+### Active Projects on MATIC
+```{r}
+
+active_projects <- webscraped_active_projects %>% 
+                      group_by(platform_currency) %>% 
+                      summarise(count = n())
+            
+valueBox(active_projects %>% 
+           filter(platform_currency == "MATIC") %>% 
+           select(count),
+         icon = "fa-hashtag")
+```
+
+
+### Active Projects on SOL
+```{r}
+
+active_projects <- webscraped_active_projects %>% 
+                      group_by(platform_currency) %>% 
+                      summarise(count = n())
+            
+valueBox(active_projects %>% 
+           filter(platform_currency == "SOL") %>% 
+           select(count),
+         icon = "fa-hashtag")
+```
+
+
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### Active Projects
+
+```{r reactable, cache=TRUE}
+
+#merge full API data table with active scraped data
+webscraped_active_projects <- inner_join(webscraped_active_projects, 
+                   currencies_ticker %>% select(1,24:58), 
+                   by = "id")
 
 library("reactablefmtr")
 
@@ -118,14 +238,12 @@ webscraped_active_projects %>%
     high = colDef(name = "Highest Price",
                   format = colFormat(prefix = "€", 
                                       separators = TRUE, 
-                                      digits = 2)
-                  ),
+                                      digits = 2)),
     price_pct_ath = colDef(name = "Price % from ATH",
                            format = colFormat(suffix = "%",
                                       digits = 1),
                            style = color_scales(., colors = c('#ff0000', '#ffa700', '#fff400', "#a3ff00", "#2cba00"), 
-                                                bold_text = TRUE),
-                           ),
+                                                bold_text = TRUE)),
     high_timestamp = colDef(name = "ATH Timestamp",
                             format = colFormat(date = TRUE)
                             ),
@@ -136,7 +254,7 @@ webscraped_active_projects %>%
     market_cap = colDef(name = "Market Cap",
                         format = colFormat(prefix = "€", 
                                       separators = TRUE, 
-                                      digits = 2)
+                                      digits = 0)
                   ),
     market_cap_dominance = colDef(name = "Market Cap Dominance",
                                   format = colFormat(suffix = "%",
@@ -150,6 +268,177 @@ webscraped_active_projects %>%
 
 ```
 
+### Periodic Volumes
+
+```{r periodic volumes portfolio, cache=TRUE}
+
+library("reactablefmtr")
+
+webscraped_active_projects %>% select(logo_url,
+                      "1d_volume",
+                      "7d_volume",
+                      "30d_volume",
+                      "365d_volume",
+                      "ytd_volume") %>% 
+  reactable(
+    defaultColDef = colDef(
+      format = colFormat(prefix = "€", 
+                         separators = TRUE, 
+                        digits = 0),
+      align = "center",
+      headerStyle = list(background = "#f7f7f8")
+      ),
+    defaultPageSize = 25,
+    bordered = TRUE,
+    highlight = TRUE,
+    columns = list(
+      logo_url = colDef(name = "Logo",
+                        cell = embed_img(logo_url)
+                        ),
+      "1d_volume" = colDef(name = "1 Day Volume"),
+      "7d_volume" = colDef(name = "7 Day Volume"),
+      "30d_volume" = colDef(name = "30 Day Volume"),
+      "365d_volume" = colDef(name = "365 Day Volume"),
+      "ytd_volume" = colDef(name = "Year to Date Volume")
+  ))
+
+```
+
+### Price Change %
+
+```{r price change percent portfolio, cache=TRUE}
+
+library("reactablefmtr")
+
+
+webscraped_active_projects %>% select(logo_url,
+                      "1d_price_change_pct",
+                      "7d_price_change_pct",
+                      "30d_price_change_pct",
+                      "365d_price_change_pct",
+                      "ytd_price_change_pct") %>% 
+  reactable(
+    defaultColDef = colDef(
+      format = colFormat(percent = TRUE,
+                         separators = TRUE,
+                         digits = 1),
+      align = "center",
+      headerStyle = list(background = "#f7f7f8"),
+      style = pos_neg_colors("red", "green", 
+                             bold = TRUE),
+      ),
+    defaultPageSize = 25,
+    bordered = TRUE,
+    highlight = TRUE,
+    #style = list(fontFamily = "Montserrat, sans-serif", fontSize = "1rem"),
+      columns = list(
+         logo_url = colDef(name = "Logo",
+                           cell = embed_img(logo_url))
+         )
+  )
+
+```
+
+### Market Cap Change
+
+```{r market cap change portfolio, cache=TRUE}
+
+library("reactablefmtr")
+
+webscraped_active_projects %>% select(logo_url,
+                      "1d_market_cap_change",
+                      "7d_market_cap_change",
+                      "30d_market_cap_change",
+                      "365d_market_cap_change",
+                      "ytd_market_cap_change") %>% 
+  reactable(
+    defaultColDef = colDef(
+    format = colFormat(prefix = "€", 
+                       separators = TRUE, 
+                      digits = 3),
+    style = pos_neg_colors("red", "green", 
+                             bold = TRUE),
+    align = "center",
+    headerStyle = list(background = "#f7f7f8")
+  ),
+    defaultPageSize = 25,
+    bordered = TRUE,
+    highlight = TRUE,
+    # style = list(fontFamily = "Montserrat, sans-serif", fontSize = "1rem"),
+      columns = list(
+         logo_url = colDef(name = "Logo",
+                      cell = embed_img(logo_url))
+  ))
+
+```
+
+
+### Volume Change %
+
+```{r volume change percent portfolio, cache=TRUE}
+
+library("reactablefmtr")
+
+webscraped_active_projects %>% select(logo_url,
+                      "1d_volume_change_pct",
+                      "7d_volume_change_pct",
+                      "30d_volume_change_pct",
+                      "365d_volume_change_pct",
+                      "ytd_volume_change_pct") %>% 
+  reactable(
+    defaultColDef = colDef(
+    format = colFormat(separators = TRUE,
+                       percent = TRUE,
+                       digits = 1),
+    style = pos_neg_colors("red", "green", 
+                             bold = TRUE),
+    align = "center",
+    headerStyle = list(background = "#f7f7f8")
+  ),
+    defaultPageSize = 25,
+    bordered = TRUE,
+    highlight = TRUE,
+    #style = list(fontFamily = "Montserrat, sans-serif", fontSize = "1rem"),
+      columns = list(
+         logo_url = colDef(name = "Logo",
+                      cell = embed_img(logo_url))
+  ))
+
+```
+
+### Market Cap Change %
+
+```{r market cap change percent portfolio, cache=TRUE}
+
+library("reactablefmtr")
+
+webscraped_active_projects %>% select(logo_url,
+                      "1d_market_cap_change_pct",
+                      "7d_market_cap_change_pct",
+                      "30d_market_cap_change_pct",
+                      "365d_market_cap_change_pct",
+                      "ytd_market_cap_change_pct") %>% 
+  reactable(
+    defaultColDef = colDef(
+      format = colFormat(percent = TRUE,
+                         separators = TRUE,
+                         digits = 1),
+      align = "center",
+      headerStyle = list(background = "#f7f7f8"),
+      style = pos_neg_colors("red", "green", 
+                             bold = TRUE),
+      ),
+    defaultPageSize = 25,
+    bordered = TRUE,
+    highlight = TRUE,
+    #style = list(fontFamily = "Montserrat, sans-serif", fontSize = "1rem"),
+      columns = list(
+         logo_url = colDef(name = "Logo",
+                           cell = embed_img(logo_url))
+         )
+  )
+
+```
 
 
 Global Data {data-orientation=rows}
@@ -210,7 +499,7 @@ plot <- currencies_ticker %>%
   geom_bar(fill="#FCC200",) +
   labs(x = "Status", 
        y = "Number of projects",
-       title ="Status of all Cryptocurrency Projects",
+       #title ="Status of all Cryptocurrency Projects",
        subtitle = "Actively traded, inactive or dead",
        caption = "Data by nomics.com") + 
   theme_pilot() +
@@ -224,7 +513,9 @@ ggplotly(plot)
 
 ```
 
-### Status of All Cryptocurrency Projects
+> Active, inactive and 'dead' projects as listed by Nomics.com. Projects are considered active if a certain trading treshold is reached.
+
+### Amount of Cryptocurrency Projects by Platform 
 
 ```{r}
 
@@ -234,7 +525,7 @@ plot <- currencies_ticker %>% group_by(platform_currency) %>%
   geom_bar() + 
   labs(x = FALSE, 
        y = "Count",
-       title ="Amount of Cryptocurrency Projects by Platform",
+       #title ="Amount of Cryptocurrency Projects by Platform",
        subtitle = "Actively traded, inactive or dead",
        caption = "Data by Nomics.com") + 
   coord_flip() +
@@ -244,7 +535,9 @@ ggplotly(plot)
 
 ```
 
-### Status of All Cryptocurrency Projects
+> Proportion of active, inactive and dead projects for the main cryptocurrency platforms.
+
+### Status of All Cryptocurrency Projects (by platform)
 
 ```{r}
 
@@ -255,7 +548,7 @@ plot <- currencies_ticker %>%
   geom_bar(position = "stack") +
   labs(x = "Status", 
        y = "Number of projects",
-       title ="Amount of Active, Inactive and Dead Projects",
+       #title ="Amount of Active, Inactive and Dead Projects",
        subtitle = "Status by platform (N > 100)",
        caption = "Data by Nomics.com") +
   theme_pilot() +
@@ -270,7 +563,7 @@ ggplotly(plot)
 
 ```
 
-
+> Proportion of cryptocurrency platforms for all active, inactive and dead projects.
 
 
 Market Charts {data-orientation=rows}
@@ -295,7 +588,7 @@ hist_mcap <- monthly_mcap %>%
   geom_line(color = "red") +
   labs(x = NULL, #year is obvious
        y = "Market Cap ($)",
-       title ="Historical Cryptocurrency Market Cap",
+       #title ="Historical Cryptocurrency Market Cap",
        subtitle = "Monthly Aggregate",
        caption = "Data by Nomics.com") +
   scale_x_date(date_labels = "%Y",
@@ -311,6 +604,7 @@ ggplotly(hist_mcap)
 
 ```
 
+> Aggregated historical monthly market capitalization data on a logarithmic scale.
 
 ### Historical Market Volume
 
@@ -331,7 +625,7 @@ hist_vol <- monthly_vol %>%
   geom_line(color = "red") +
   labs(x = NULL, #year is obvious
        y = "Market Cap ($)",
-       title ="Historical Cryptocurrency Market Cap",
+       #title ="Historical Cryptocurrency Market Cap",
        subtitle = "Monthly Aggregate",
        caption = "Data by Nomics.com") +
   scale_x_date(date_labels = "%Y",
@@ -346,7 +640,7 @@ ggplotly(hist_vol)
 
 ```
 
-
+> Aggregated historical monthly market volume data on a logarithmic scale.
 
 
 Bitcoin Charts {data-orientation=rows}
@@ -370,7 +664,7 @@ btc_graph <- btc_candles_monthly %>% ggplot(aes()) +
   scale_colour_gradientn(colours = rainbow(5)) +
   labs(x = "Year", 
        y = "Closing Price",
-       title ="200 Week Moving Average Heatmap",
+       #title ="200 Week Moving Average Heatmap",
        subtitle = expression(`200 WMA Heatmap = 4-weekly % change in MA`["1400"]),
        caption = "Source: Crypto Market Cap & Pricing Data Provided By Nomics") +
   scale_x_date(date_labels = "%Y",
@@ -385,6 +679,9 @@ ggplotly(btc_graph)
 
 ```
 
+> In each of its major market cycles, Bitcoin's price historically bottoms out around the 200 week moving average. This indicator uses a colour heatmap based on the % increases of that 200 week moving average.
+
+> Depending on the month-by-month % increase of the 200 week moving average, a colour is assigned to the price chart. Historically, when we see orange and red dots assigned to the price chart, this has been a good time to sell Bitcoin as the market overheats. Periods where the price dots are purple and close to the 200 week MA have historically been good times to buy.
 
 ### Bitcoin 2-Year Moving Average (MA) Multiplier
 
@@ -406,7 +703,7 @@ btc_graph <- btc_candles_monthly %>% ggplot(aes(x = timestamp)) +
                                 "2Y_MA" = "blue")) +
     labs(x = "Year", 
        y = "Closing Price",
-       title ="Bitcoin 2-Year MA Multiplier",
+       #title ="Bitcoin 2-Year MA Multiplier",
        subtitle = expression(`MA[730] and MA[730*5]`),
        caption = "Source: Crypto Market Cap & Pricing Data Provided By Nomics") +
   scale_x_date(date_labels = "%Y",
@@ -421,6 +718,8 @@ ggplotly(btc_graph)
 
 
 ```
+
+> Buying Bitcoin when price drops below the 2yr MA (green line) has historically generated outsized returns. Selling Bitcoin when price goes above the 2yr MA x 5 (red line) has been historically effective for taking profit.
 
 
 ### Stocks vs. Crypto Charts
@@ -441,10 +740,7 @@ plot <- stocks_vs_crypto %>%
   scale_y_log10() +
   #scale_x_date(name="Month", date_breaks="3 month", minor_breaks=NULL, date_labels="%b-%Y") +
   #theme_fivethirtyeight() +
-  theme(axis.title = element_text(),
-        legend.text =  element_text(size=10),
-        axis.text.x = element_text(angle = 0, hjust = 1)
-        ) +
+  theme_pilot() +
   guides(fill = guide_legend(title = "Type"))
 
 
@@ -452,7 +748,7 @@ ggplotly(plot)
 
 ```
 
-
+> Just a reminder for when you want to invest in traditional stocks. Cryptocurrency such as BTC and ETH have vastly outperformed the major corporations such as Apple (and even Tesla) over the past years. 
 
 Fear & Greed
 =======================================================================
@@ -490,6 +786,7 @@ fear_greed %>%
 
 ```
 
+> Simple line chart of values for the Fear & Greed index as listed by alternative.me.
 
 ### Fear & Greed Index (Scatter Plot)
 
@@ -509,6 +806,7 @@ fig
 
 ```
 
+> Scatter plot with color highlighting the different phases of 'fear' or 'greed'. 
 
 Column {data-width=400}
 -------------------------------------
@@ -533,6 +831,7 @@ fg_bargraph
 
 ```
 
+> Bar chart listing the cumulative time we have spent in different phases. You can clearly see there has been a lot more of 'extreme fear' than there has been 'extreme greed'.
 
 ### Fear & Greed Index (Pie Chart)
 
@@ -550,21 +849,47 @@ fg_piechart
 
 ```
 
+> Pie chart listing the cumulative time we have spent in different phases. You can clearly see there has been a lot more of 'extreme fear' than there has been 'extreme greed'.
 
 
-
-
-
-Centraal Bureau voor de Statistiek (CBS) {data-orientation=rows}
+Statistics Netherlands (CBS) {data-orientation=rows}
 =======================================================================
+
 
 Row {.tabset .tabset-fade}
 -------------------------------------
 
+### Consumer confidence, economic climate and willingness to buy; adjusted
+
+```{r}
+
+
+p1 <- consumer_trust %>% pivot_longer(consumer_trust:timeto_bigspend, 
+                                        names_to = "indicator", 
+                                        values_to = "values") %>% 
+  ggplot(aes(period, values, color = indicator)) + 
+  geom_line() +
+  geom_point() +
+  labs(x = "Date", #year is obvious
+       y = "Trust Level (%)",
+       #title ="Consumer Trust (Netherlands)",
+       subtitle = "Monthly Aggregate",
+       caption = "Data by CBS") +
+  scale_y_continuous(limits = c(-100,100)) +
+  scale_x_date(date_breaks = "1 year",
+               date_labels = "%Y",
+               date_minor_breaks="3 months") +
+  theme_pilot()                     
+
+ggplotly(p1)
+
+```
+
+> Seasonally adjusted data on Dutch consumers' views and expectations regarding general economic developments and their own financial situation. The indicators can have a value from -100 (everyone answers negative) to +100 (everyone answers positive). With a value of 0, the proportion of pessimists equals the proportion of optimists.
+
 ### Consumer Trust
 
 ```{r}
-invasion <- lubridate::ymd('2022-02-24')
 
 p1 <- consumer_trust %>% 
   ggplot(aes(period, consumer_trust)) + 
@@ -572,22 +897,20 @@ p1 <- consumer_trust %>%
   geom_point(color = "blue") +
 labs(x = "Date", #year is obvious
      y = "Trust Level (%)",
-     title ="Consumer Trust (Netherlands)",
+     #title ="Consumer Trust (Netherlands)",
      subtitle = "Monthly Aggregate",
      caption = "Data by CBS") +
   scale_y_continuous(limits = c(-100,100)) +
   scale_x_date(date_breaks = "1 year",
                date_labels = "%Y",
                date_minor_breaks="3 months") +
-  geom_vline(xintercept = invasion,
-             linetype = "dashed") +
   theme_pilot()                     
                        
 ggplotly(p1)
 
 ```
 
-### Economic Climate
+> Consumer confidence is an indicator that provides information about consumers' confidence and perceptions regarding developments in the Dutch economy and their own financial situation.
 
 ```{r}
 p1 <- consumer_trust %>% 
@@ -597,7 +920,7 @@ p1 <- consumer_trust %>%
              size = "0.8") +
 labs(x = "Date", #year is obvious
      y = "Trust Level (%)",
-     title ="Economic Climate (Netherlands)",
+     #title ="Economic Climate (Netherlands)",
      subtitle = "Monthly Aggregate",
      caption = "Data by CBS") +
   scale_y_continuous(limits = c(-100,100)) +
@@ -621,7 +944,7 @@ p1 <- consumer_trust %>%
              size = "0.8") +
 labs(x = "Date", #year is obvious
      y = "Trust Level (%)",
-     title ="Financial Situation (Netherlands)",
+     #title ="Financial Situation (Netherlands)",
      subtitle = "Monthly Aggregate",
      caption = "Data by CBS") +
   scale_y_continuous(limits = c(-100,100)) +
@@ -645,7 +968,7 @@ p1 <- consumer_trust %>%
              size = "0.8") +
 labs(x = "Date", #year is obvious
      y = "Trust Level (%)",
-     title ="Financial Situation (Netherlands)",
+     #title ="Financial Situation (Netherlands)",
      subtitle = "Monthly Aggregate",
      caption = "Data by CBS") +
   scale_y_continuous(limits = c(-100,100)) +
@@ -668,7 +991,7 @@ p1 <- fuel_prices %>%
   geom_line() +
   labs(x = "Date", #year is obvious
        y = "Price",
-       title ="Fuel Prices at Petrol Stations",
+       #title ="Fuel Prices at Petrol Stations",
        subtitle = "Monthly Aggregate",
        caption = "Data by Nomics.com") +
   scale_y_continuous(labels = dollar_format(suffix = "€", 
@@ -686,20 +1009,20 @@ ggplotly(p1)
 
 ```{r}
 p1 <- CPI %>% 
-select(Perioden, JaarmutatieCPI_1) %>% 
-ggplot(aes(Perioden, JaarmutatieCPI_1, 
-           group = 1)) +
-#geom_point() +
-geom_line(color = "red") +
-geom_point(color = "blue",
-           size = 0.6,
-           alpha = 0.8) +
-labs(title = " Consumer Price Index (CPI)",
-     subtitle = "1963 januari - 2022 april",
-     caption="bron: CBS (https://opendata.cbs.nl)"
-     ) +
-  xlab("Jaar") +
-  ylab("Jaarmutatie CPI (%)") +
+  select(Perioden, JaarmutatieCPI_1) %>% 
+  ggplot(aes(Perioden, JaarmutatieCPI_1, 
+             group = 1)) +
+  #geom_point() +
+  geom_line(color = "red") +
+  geom_point(color = "blue",
+             size = 0.6,
+             alpha = 0.8) +
+  labs(x = "Jaar",
+       y = "Jaarmutatie CPI (%)",
+       #title = " Consumer Price Index (CPI)",
+       subtitle = "1963 januari - 2022 april",
+       caption="bron: CBS (https://opendata.cbs.nl)"
+       ) +
   scale_x_date(date_breaks = "10 year",
                date_labels = "%Y") + 
   theme_pilot()
