@@ -268,6 +268,8 @@ webscraped_active_projects %>%
 
 ```
 
+> Active cryptocurrency projects. *Source: https://nomics.com/*
+
 ### Periodic Volumes
 
 ```{r periodic volumes portfolio, cache=TRUE}
@@ -304,6 +306,8 @@ webscraped_active_projects %>% select(logo_url,
 
 ```
 
+> Periodic aggregated trading volumes for all active projects. *Source: https://nomics.com/*
+
 ### Price Change %
 
 ```{r price change percent portfolio, cache=TRUE}
@@ -339,6 +343,9 @@ webscraped_active_projects %>% select(logo_url,
 
 ```
 
+
+> Periodic price changes for all active projects. *Source: https://nomics.com/*
+
 ### Market Cap Change
 
 ```{r market cap change portfolio, cache=TRUE}
@@ -371,6 +378,8 @@ webscraped_active_projects %>% select(logo_url,
   ))
 
 ```
+
+> Periodic market cap changes for all active projects. *Source: https://nomics.com/*
 
 
 ### Volume Change %
@@ -406,6 +415,9 @@ webscraped_active_projects %>% select(logo_url,
 
 ```
 
+> Periodic volume change % for all active projects. *Source: https://nomics.com/*
+
+
 ### Market Cap Change %
 
 ```{r market cap change percent portfolio, cache=TRUE}
@@ -440,6 +452,8 @@ webscraped_active_projects %>% select(logo_url,
 
 ```
 
+> Periodic market cap change % for all active projects. *Source: https://nomics.com/*
+
 
 Global Data {data-orientation=rows}
 =======================================================================
@@ -452,7 +466,6 @@ Row
 valueBox(currencies_ticker$price_timestamp[1],
          icon = "fa-calendar")
 ```
-
 
 ### Total Number of Projects
 ```{r}
@@ -507,13 +520,13 @@ plot <- currencies_ticker %>%
         legend.text =  element_text(size=10)) +
   guides(fill = guide_legend(title = "Type")) +
   coord_flip() +
-  scale_y_continuous(labels = scales::label_number_si())
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale()))
 
 ggplotly(plot)
 
 ```
 
-> Active, inactive and 'dead' projects as listed by Nomics.com. Projects are considered active if a certain trading treshold is reached.
+> Active, inactive and 'dead' projects as listed by Nomics.com. Projects are considered active if a certain trading treshold is reached. *Source: https://nomics.com/*
 
 ### Amount of Cryptocurrency Projects by Platform 
 
@@ -535,7 +548,7 @@ ggplotly(plot)
 
 ```
 
-> Proportion of active, inactive and dead projects for the main cryptocurrency platforms.
+> Proportion of active, inactive and dead projects for the main cryptocurrency platforms. *Source: https://nomics.com/*
 
 ### Status of All Cryptocurrency Projects (by platform)
 
@@ -553,7 +566,7 @@ plot <- currencies_ticker %>%
        caption = "Data by Nomics.com") +
   theme_pilot() +
   coord_flip() +
-  scale_y_continuous(labels = scales::label_number_si()) +
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
   theme(axis.title = element_text(),
         legend.text =  element_text(size=10),
         legend.key.size = unit(.5, 'cm')) +
@@ -563,7 +576,7 @@ ggplotly(plot)
 
 ```
 
-> Proportion of cryptocurrency platforms for all active, inactive and dead projects.
+> Proportion of cryptocurrency platforms for all active, inactive and dead projects. *Source: https://nomics.com/*
 
 
 Market Charts {data-orientation=rows}
@@ -596,7 +609,7 @@ hist_mcap <- monthly_mcap %>%
                date_minor_breaks = "1 month") + 
   scale_y_log10(breaks = log_breaks(10),
                 labels = label_number(scale_cut = cut_short_scale())) +
-  annotation_logticks() +
+  # annotation_logticks() +
   theme_pilot()
 
 ggplotly(hist_mcap) 
@@ -604,7 +617,7 @@ ggplotly(hist_mcap)
 
 ```
 
-> Aggregated historical monthly market capitalization data on a logarithmic scale.
+> Aggregated historical monthly market capitalization data on a logarithmic scale. *Source: https://nomics.com/*
 
 ### Historical Market Volume
 
@@ -633,14 +646,14 @@ hist_vol <- monthly_vol %>%
                date_minor_breaks = "1 month") + 
   scale_y_log10(breaks = log_breaks(10),
                 labels = label_number(scale_cut = cut_short_scale())) +
-  annotation_logticks() +
+  # annotation_logticks() +
   theme_pilot()
 
 ggplotly(hist_vol)
 
 ```
 
-> Aggregated historical monthly market volume data on a logarithmic scale.
+> Aggregated historical monthly market volume data on a logarithmic scale. *Source: https://nomics.com/*
 
 
 Bitcoin Charts {data-orientation=rows}
@@ -679,9 +692,7 @@ ggplotly(btc_graph)
 
 ```
 
-> In each of its major market cycles, Bitcoin's price historically bottoms out around the 200 week moving average. This indicator uses a colour heatmap based on the % increases of that 200 week moving average.
-
-> Depending on the month-by-month % increase of the 200 week moving average, a colour is assigned to the price chart. Historically, when we see orange and red dots assigned to the price chart, this has been a good time to sell Bitcoin as the market overheats. Periods where the price dots are purple and close to the 200 week MA have historically been good times to buy.
+> In each of its major market cycles, Bitcoin's price historically bottoms out around the 200 week moving average. This indicator uses a colour heatmap based on the % increases of that 200 week moving average. Depending on the month-by-month % increase of the 200 week moving average, a colour is assigned to the price chart. Historically, when we see orange and red dots assigned to the price chart, this has been a good time to sell Bitcoin as the market overheats. Periods where the price dots are purple and close to the 200 week MA have historically been good times to buy. *Source: https://nomics.com/*
 
 ### Bitcoin 2-Year Moving Average (MA) Multiplier
 
@@ -719,7 +730,7 @@ ggplotly(btc_graph)
 
 ```
 
-> Buying Bitcoin when price drops below the 2yr MA (green line) has historically generated outsized returns. Selling Bitcoin when price goes above the 2yr MA x 5 (red line) has been historically effective for taking profit.
+> Buying Bitcoin when price drops below the 2yr MA (green line) has historically generated outsized returns. Selling Bitcoin when price goes above the 2yr MA x 5 (red line) has been historically effective for taking profit. *Source: https://nomics.com/*
 
 
 ### Stocks vs. Crypto Charts
@@ -748,7 +759,7 @@ ggplotly(plot)
 
 ```
 
-> Just a reminder for when you want to invest in traditional stocks. Cryptocurrency such as BTC and ETH have vastly outperformed the major corporations such as Apple (and even Tesla) over the past years. 
+> Just a reminder for when you want to invest in traditional stocks. Cryptocurrency such as BTC and ETH have vastly outperformed the major corporations such as Apple (and even Tesla) over the past years. *Source: https://nomics.com/ & https://finance.yahoo.com/*
 
 Fear & Greed
 =======================================================================
@@ -786,7 +797,7 @@ fear_greed %>%
 
 ```
 
-> Simple line chart of values for the Fear & Greed index as listed by alternative.me.
+> Simple line chart of values for the Fear & Greed index as listed by alternative.me. *Source: https://alternative.me/crypto/fear-and-greed-index*
 
 ### Fear & Greed Index (Scatter Plot)
 
@@ -806,7 +817,7 @@ fig
 
 ```
 
-> Scatter plot with color highlighting the different phases of 'fear' or 'greed'. 
+> Scatter plot with color highlighting the different phases of 'fear' or 'greed'. *Source: https://alternative.me/crypto/fear-and-greed-index*
 
 Column {data-width=400}
 -------------------------------------
@@ -831,7 +842,7 @@ fg_bargraph
 
 ```
 
-> Bar chart listing the cumulative time we have spent in different phases. You can clearly see there has been a lot more of 'extreme fear' than there has been 'extreme greed'.
+> Bar chart listing the cumulative time we have spent in different phases. You can clearly see there has been a lot more of 'extreme fear' than there has been 'extreme greed'. *Source: https://alternative.me/crypto/fear-and-greed-index*
 
 ### Fear & Greed Index (Pie Chart)
 
@@ -849,7 +860,7 @@ fg_piechart
 
 ```
 
-> Pie chart listing the cumulative time we have spent in different phases. You can clearly see there has been a lot more of 'extreme fear' than there has been 'extreme greed'.
+> Pie chart listing the cumulative time we have spent in different phases. You can clearly see there has been a lot more of 'extreme fear' than there has been 'extreme greed'. *Source: https://alternative.me/crypto/fear-and-greed-index*
 
 
 Statistics Netherlands (CBS) {data-orientation=rows}
@@ -884,105 +895,10 @@ p1 <- consumer_trust %>% pivot_longer(consumer_trust:timeto_bigspend,
 ggplotly(p1)
 
 ```
-
-> Seasonally adjusted data on Dutch consumers' views and expectations regarding general economic developments and their own financial situation. The indicators can have a value from -100 (everyone answers negative) to +100 (everyone answers positive). With a value of 0, the proportion of pessimists equals the proportion of optimists.
-
-### Consumer Trust
-
-```{r}
-
-p1 <- consumer_trust %>% 
-  ggplot(aes(period, consumer_trust)) + 
-  geom_line(color = "red") +
-  geom_point(color = "blue") +
-labs(x = "Date", #year is obvious
-     y = "Trust Level (%)",
-     #title ="Consumer Trust (Netherlands)",
-     subtitle = "Monthly Aggregate",
-     caption = "Data by CBS") +
-  scale_y_continuous(limits = c(-100,100)) +
-  scale_x_date(date_breaks = "1 year",
-               date_labels = "%Y",
-               date_minor_breaks="3 months") +
-  theme_pilot()                     
-                       
-ggplotly(p1)
-
-```
-
-> Consumer confidence is an indicator that provides information about consumers' confidence and perceptions regarding developments in the Dutch economy and their own financial situation.
-
-```{r}
-p1 <- consumer_trust %>% 
-  ggplot(aes(period, economic_climate)) + 
-  geom_line(color = "red") +
-  geom_point(color = "blue",
-             size = "0.8") +
-labs(x = "Date", #year is obvious
-     y = "Trust Level (%)",
-     #title ="Economic Climate (Netherlands)",
-     subtitle = "Monthly Aggregate",
-     caption = "Data by CBS") +
-  scale_y_continuous(limits = c(-100,100)) +
-  scale_x_date(date_breaks = "1 year",
-               date_labels = "%Y",
-               date_minor_breaks="3 months") +
-  theme_pilot()                     
-                       
-ggplotly(p1)
-
-```
+> Seasonally adjusted data on Dutch consumers' views and expectations regarding general economic developments and their own financial situation. The indicators can have a value from -100 (everyone answers negative) to +100 (everyone answers positive). With a value of 0, the proportion of pessimists equals the proportion of optimists. *Source: https://opendata.cbs.nl/statline/#/CBS/nl/dataset/83693NED*
 
 
-### Financial Situation (last 12 months)
-
-```{r}
-p1 <- consumer_trust %>% 
-  ggplot(aes(period, finances_last12mo)) + 
-  geom_line(color = "red") +
-  geom_point(color = "blue",
-             size = "0.8") +
-labs(x = "Date", #year is obvious
-     y = "Trust Level (%)",
-     #title ="Financial Situation (Netherlands)",
-     subtitle = "Monthly Aggregate",
-     caption = "Data by CBS") +
-  scale_y_continuous(limits = c(-100,100)) +
-  scale_x_date(date_breaks = "1 year",
-               date_labels = "%Y",
-               date_minor_breaks="3 months") +
-  theme_pilot()                     
-                       
-ggplotly(p1)
-
-```
-
-
-### Financial Situation (coming 12 months)
-
-```{r}
-p1 <- consumer_trust %>% 
-  ggplot(aes(period, finances_next12mo)) + 
-  geom_line(color = "red") +
-  geom_point(color = "blue",
-             size = "0.8") +
-labs(x = "Date", #year is obvious
-     y = "Trust Level (%)",
-     #title ="Financial Situation (Netherlands)",
-     subtitle = "Monthly Aggregate",
-     caption = "Data by CBS") +
-  scale_y_continuous(limits = c(-100,100)) +
-  scale_x_date(date_breaks = "1 year",
-               date_labels = "%Y",
-               date_minor_breaks="3 months") +
-  theme_pilot()                     
-                       
-ggplotly(p1)
-
-```
-
-
-### Fuel Prices
+### Pump prices motor fuels; fuel type, per day
 
 ```{r}
 # Mean monthly market cap
@@ -1003,9 +919,10 @@ ggplotly(p1)
 
 ```
 
+> This table contains pump prices of motor fuels. It shows weighted average daily prices of gasoline (Euro95), diesel oil and LPG including VAT and excise duty. *Source: https://opendata.cbs.nl/statline/#/CBS/nl/dataset/80416NED*
 
 
-### Consumer Price Index (CPI) - Inflation
+### Periodic changes in Consumer Pprice Index; from 1963
 
 ```{r}
 p1 <- CPI %>% 
@@ -1029,3 +946,5 @@ p1 <- CPI %>%
 
 ggplotly(p1)
 ```
+
+> This table shows changes (mutations) in the Consumer Price Index (CPI) from the time it was first published. The chart shows how the prices of goods and services for consumers develop over time. *Source: https://opendata.cbs.nl/statline/#/CBS/nl/dataset/70936NED*
