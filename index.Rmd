@@ -3,7 +3,11 @@ title: "Flexdashboard"
 author: "Max Kruisbrink"
 output: 
   flexdashboard::flex_dashboard:
+<<<<<<< HEAD
     favicon: "20220808_maxplaining-logo.jpg"
+=======
+    favicon: "20220808_maxplaining-logo-48x48.jpg"
+>>>>>>> c3de880d06a6dba8c537ae86f60ba2dbef83d1d6
     orientation: rows
     social: menu
 ---
@@ -167,6 +171,10 @@ valueBox(value =  active_projects %>%
          )
 ```
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> c3de880d06a6dba8c537ae86f60ba2dbef83d1d6
 ### Active Projects on MATIC
 ```{r}
 
@@ -202,11 +210,14 @@ Row {.tabset .tabset-fade}
 ### Active Projects
 
 ```{r reactable, cache=TRUE}
+<<<<<<< HEAD
 
 #merge full API data table with active scraped data
 webscraped_active_projects <- inner_join(webscraped_active_projects, 
                    currencies_ticker %>% select(1,24:58), 
                    by = "id")
+=======
+>>>>>>> c3de880d06a6dba8c537ae86f60ba2dbef83d1d6
 
 library("reactablefmtr")
 
@@ -268,6 +279,7 @@ webscraped_active_projects %>%
 
 ```
 
+<<<<<<< HEAD
 > Active cryptocurrency projects. *Source: https://nomics.com/*
 
 ### Periodic Volumes
@@ -308,6 +320,8 @@ webscraped_active_projects %>% select(logo_url,
 
 > Periodic aggregated trading volumes for all active projects. *Source: https://nomics.com/*
 
+=======
+>>>>>>> c3de880d06a6dba8c537ae86f60ba2dbef83d1d6
 ### Price Change %
 
 ```{r price change percent portfolio, cache=TRUE}
@@ -315,7 +329,11 @@ webscraped_active_projects %>% select(logo_url,
 library("reactablefmtr")
 
 
+<<<<<<< HEAD
 webscraped_active_projects %>% select(logo_url,
+=======
+currencies_ticker %>% select(logo_url,
+>>>>>>> c3de880d06a6dba8c537ae86f60ba2dbef83d1d6
                       "1d_price_change_pct",
                       "7d_price_change_pct",
                       "30d_price_change_pct",
@@ -343,6 +361,7 @@ webscraped_active_projects %>% select(logo_url,
 
 ```
 
+<<<<<<< HEAD
 
 > Periodic price changes for all active projects. *Source: https://nomics.com/*
 
@@ -453,6 +472,8 @@ webscraped_active_projects %>% select(logo_url,
 ```
 
 > Periodic market cap change % for all active projects. *Source: https://nomics.com/*
+=======
+>>>>>>> c3de880d06a6dba8c537ae86f60ba2dbef83d1d6
 
 
 Global Data {data-orientation=rows}
@@ -526,8 +547,11 @@ ggplotly(plot)
 
 ```
 
+<<<<<<< HEAD
 > Active, inactive and 'dead' projects as listed by Nomics.com. Projects are considered active if a certain trading treshold is reached. *Source: https://nomics.com/*
 
+=======
+>>>>>>> c3de880d06a6dba8c537ae86f60ba2dbef83d1d6
 ### Amount of Cryptocurrency Projects by Platform 
 
 ```{r}
@@ -863,10 +887,21 @@ fg_piechart
 > Pie chart listing the cumulative time we have spent in different phases. You can clearly see there has been a lot more of 'extreme fear' than there has been 'extreme greed'. *Source: https://alternative.me/crypto/fear-and-greed-index*
 
 
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> c3de880d06a6dba8c537ae86f60ba2dbef83d1d6
 Statistics Netherlands (CBS) {data-orientation=rows}
 =======================================================================
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> c3de880d06a6dba8c537ae86f60ba2dbef83d1d6
 Row {.tabset .tabset-fade}
 -------------------------------------
 
@@ -874,6 +909,7 @@ Row {.tabset .tabset-fade}
 
 ```{r}
 
+<<<<<<< HEAD
 
 p1 <- consumer_trust %>% pivot_longer(consumer_trust:timeto_bigspend, 
                                         names_to = "indicator", 
@@ -886,6 +922,41 @@ p1 <- consumer_trust %>% pivot_longer(consumer_trust:timeto_bigspend,
        #title ="Consumer Trust (Netherlands)",
        subtitle = "Monthly Aggregate",
        caption = "Data by CBS") +
+=======
+p1 <- consumer_trust %>% 
+  ggplot(aes(period, consumer_trust)) + 
+  geom_line(color = "red") +
+  geom_point(color = "blue") +
+labs(x = "Date", #year is obvious
+     y = "Trust Level (%)",
+     #title ="Consumer Trust (Netherlands)",
+     subtitle = "Monthly Aggregate",
+     caption = "Data by CBS") +
+  scale_y_continuous(limits = c(-100,100)) +
+  scale_x_date(date_breaks = "1 year",
+               date_labels = "%Y",
+               date_minor_breaks="3 months") +
+  geom_vline(xintercept = invasion,
+             linetype = "dashed") +
+  theme_pilot()                     
+                       
+ggplotly(p1)
+
+```
+
+
+```{r}
+p1 <- consumer_trust %>% 
+  ggplot(aes(period, economic_climate)) + 
+  geom_line(color = "red") +
+  geom_point(color = "blue",
+             size = "0.8") +
+labs(x = "Date", #year is obvious
+     y = "Trust Level (%)",
+     #title ="Economic Climate (Netherlands)",
+     subtitle = "Monthly Aggregate",
+     caption = "Data by CBS") +
+>>>>>>> c3de880d06a6dba8c537ae86f60ba2dbef83d1d6
   scale_y_continuous(limits = c(-100,100)) +
   scale_x_date(date_breaks = "1 year",
                date_labels = "%Y",
@@ -898,7 +969,59 @@ ggplotly(p1)
 > Seasonally adjusted data on Dutch consumers' views and expectations regarding general economic developments and their own financial situation. The indicators can have a value from -100 (everyone answers negative) to +100 (everyone answers positive). With a value of 0, the proportion of pessimists equals the proportion of optimists. *Source: https://opendata.cbs.nl/statline/#/CBS/nl/dataset/83693NED*
 
 
+<<<<<<< HEAD
 ### Pump prices motor fuels; fuel type, per day
+=======
+### Financial Situation (last 12 months)
+
+```{r}
+p1 <- consumer_trust %>% 
+  ggplot(aes(period, finances_last12mo)) + 
+  geom_line(color = "red") +
+  geom_point(color = "blue",
+             size = "0.8") +
+labs(x = "Date", #year is obvious
+     y = "Trust Level (%)",
+     #title ="Financial Situation (Netherlands)",
+     subtitle = "Monthly Aggregate",
+     caption = "Data by CBS") +
+  scale_y_continuous(limits = c(-100,100)) +
+  scale_x_date(date_breaks = "1 year",
+               date_labels = "%Y",
+               date_minor_breaks="3 months") +
+  theme_pilot()                     
+                       
+ggplotly(p1)
+
+```
+
+
+### Financial Situation (coming 12 months)
+
+```{r}
+p1 <- consumer_trust %>% 
+  ggplot(aes(period, finances_next12mo)) + 
+  geom_line(color = "red") +
+  geom_point(color = "blue",
+             size = "0.8") +
+labs(x = "Date", #year is obvious
+     y = "Trust Level (%)",
+     #title ="Financial Situation (Netherlands)",
+     subtitle = "Monthly Aggregate",
+     caption = "Data by CBS") +
+  scale_y_continuous(limits = c(-100,100)) +
+  scale_x_date(date_breaks = "1 year",
+               date_labels = "%Y",
+               date_minor_breaks="3 months") +
+  theme_pilot()                     
+                       
+ggplotly(p1)
+
+```
+
+
+### Fuel Prices
+>>>>>>> c3de880d06a6dba8c537ae86f60ba2dbef83d1d6
 
 ```{r}
 # Mean monthly market cap
